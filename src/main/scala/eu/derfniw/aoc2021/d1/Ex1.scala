@@ -8,7 +8,7 @@ private def mapInput(in: Source) =
   in.getLines.filter(_.matches("""[0-9]+""")).map(_.toInt).toList
 
 private def countIncreasingPairs(in: List[Int]) =
-  in.zip(in.tail).map((prev, next) => if (prev < next) 1 else 0).sum
+  in.sliding(2).count { case prev +: next +: _ => prev < next }
 
 def exercise1(in: Source): Int = countIncreasingPairs(mapInput(in))
 
