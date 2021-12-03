@@ -37,9 +37,7 @@ def exercise2(in: Source): Int = {
     .range(0, input.head.length)
     .reverse
     .foldLeft((input, counts)) {
-      case ((i, c), _) if i.length == 1 =>
-        println(s"Found: ${i.head.reverse}")
-        (i, c)
+      case ((i, c), _) if i.length == 1 => (i, c)
       case ((i, c), idx) =>
         val mostCommon = if (c(idx) < i.length / 2f) 0 else 1
         val newNums    = i.filter(_(idx) == mostCommon)
@@ -55,9 +53,7 @@ def exercise2(in: Source): Int = {
     .range(0, input.head.length)
     .reverse
     .foldLeft((input, counts)) {
-      case ((i, c), _) if i.length == 1 =>
-        println(s"Found: ${i.head.reverse}")
-        (i, c)
+      case ((i, c), _) if i.length == 1 => (i, c)
       case ((i, c), idx) =>
         val leastCommon = if (c(idx) < i.length / 2f) 1 else 0
         val newNums     = i.filter(_(idx) == leastCommon)
