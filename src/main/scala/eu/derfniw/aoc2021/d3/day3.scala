@@ -1,69 +1,71 @@
 package eu.derfniw.aoc2021.d3
 
-import scala.io.Source;
+import scala.io.Source
 
-private def parseInput(in: Source) = {
-  in.getLines().map(_.map(_.toString.toInt).reverse).toSeq
+private def parseInput(in: Source): BitValues = {
+  val lines    = in.getLines().toSeq
+  val bitWidth = lines.head.length
+  BitValues(lines.map(str => Integer.valueOf(str, 2)), bitWidth)
 }
 
-private def bitCounts(binNums: Seq[Seq[Int]]): Seq[Int] =
-  binNums.foldLeft(List.fill(binNums.head.length)(0)) { (counts, nums) =>
-    counts.zip(nums).map((count, num) => count + num)
+class BitValues(vals: Seq[Int], val bitWidth: Int) {
+
+  private val bitMasks = (0 until bitWidth).map(1 << _)
+
+  val length: Int = vals.length
+  val head: Int   = vals.head
+
+  val oneCounts: Seq[Int] = bitMasks.map { mask =>
+    vals.map(_ & mask).count(_ > 0)
   }
 
+  val zeroCounts: Seq[Int] = bitMasks.map { mask =>
+    vals.map(_ & mask).count(_ == 0)
+  }
+
+  def keepOnes(bitIndex: Int): BitValues =
+    BitValues(vals.filter(v => (v & bitMasks(bitIndex)) > 0), bitWidth)
+
+  def keepZeroes(bitIndex: Int): BitValues =
+    BitValues(vals.filter(v => (v & bitMasks(bitIndex)) == 0), bitWidth)
+}
+
 def exercise1(in: Source): Int = {
-  val input       = parseInput(in)
-  val inputLength = input.length
-  val counts      = bitCounts(input)
+  val input    = parseInput(in)
+  val combined = input.oneCounts.zip(input.zeroCounts)
+  val gamma = combined
+    .map((oneCount, zeroCount) => if (oneCount > zeroCount) '1' else '0')
+    .reverse
+    .mkString
+  val epsilon = combined
+    .map((oneCount, zeroCount) => if (oneCount < zeroCount) '1' else '0')
+    .reverse
+    .mkString
 
-  val gamma = counts.zipWithIndex.map { (num, idx) =>
-    if (num > inputLength / 2) 1 * math.pow(2, idx).toInt
-    else 0
-  }.sum
-
-  val epsilon = counts.zipWithIndex.map { (num, idx) =>
-    if (num < inputLength / 2) 1 * math.pow(2, idx).toInt
-    else 0
-  }.sum
-
-  gamma * epsilon
+  Integer.valueOf(gamma, 2) * Integer.valueOf(epsilon, 2)
 }
 
 def exercise2(in: Source): Int = {
-  val input  = parseInput(in)
-  val counts = bitCounts(input)
+  val input          = parseInput(in)
+  val indexesToCheck = (0 until input.bitWidth).reverse
 
-  val ox = List
-    .range(0, input.head.length)
-    .reverse
-    .foldLeft((input, counts)) {
-      case ((i, c), _) if i.length == 1 => (i, c)
-      case ((i, c), idx) =>
-        val mostCommon = if (c(idx) < i.length / 2f) 0 else 1
-        val newNums    = i.filter(_(idx) == mostCommon)
-        (newNums, bitCounts(newNums))
+  val ox = indexesToCheck
+    .foldLeft(input) {
+      case (i, _) if i.length == 1 => i
+      case (i, idx) =>
+        if (i.oneCounts(idx) >= i.zeroCounts(idx)) i.keepOnes(idx)
+        else i.keepZeroes(idx)
     }
-    ._1
     .head
-    .zipWithIndex
-    .map((n, i) => n * math.pow(2, i).toInt)
-    .sum
 
-  val co2 = List
-    .range(0, input.head.length)
-    .reverse
-    .foldLeft((input, counts)) {
-      case ((i, c), _) if i.length == 1 => (i, c)
-      case ((i, c), idx) =>
-        val leastCommon = if (c(idx) < i.length / 2f) 1 else 0
-        val newNums     = i.filter(_(idx) == leastCommon)
-        (newNums, bitCounts(newNums))
+  val co2 = indexesToCheck
+    .foldLeft(input) {
+      case (i, _) if i.length == 1 => i
+      case (i, idx) =>
+        if (i.oneCounts(idx) < i.zeroCounts(idx)) i.keepOnes(idx)
+        else i.keepZeroes(idx)
     }
-    ._1
     .head
-    .zipWithIndex
-    .map((n, i) => n * math.pow(2, i).toInt)
-    .sum
 
   ox * co2
 }
