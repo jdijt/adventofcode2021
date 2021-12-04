@@ -23,3 +23,4 @@ class Day2test extends munit.FunSuite:
 
     assertEquals(result, 900)
   }
+end Day2test

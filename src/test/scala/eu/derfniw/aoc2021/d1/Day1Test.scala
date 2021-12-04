@@ -2,7 +2,7 @@ package eu.derfniw.aoc2021.d1
 
 import scala.io.Source
 
-class Ex1Test extends munit.FunSuite:
+class Day1Test extends munit.FunSuite:
 
   private val testInput =
     """ 
@@ -29,3 +29,4 @@ class Ex1Test extends munit.FunSuite:
 
     assertEquals(result, 5)
   }
+end Day1Test
