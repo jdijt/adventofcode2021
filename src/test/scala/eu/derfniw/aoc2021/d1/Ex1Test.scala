@@ -1,10 +1,8 @@
 package eu.derfniw.aoc2021.d1
 
-import munit.FunSuite
-
 import scala.io.Source
 
-class Ex1Test extends FunSuite:
+class Ex1Test extends munit.FunSuite:
 
   private val testInput =
     """ 

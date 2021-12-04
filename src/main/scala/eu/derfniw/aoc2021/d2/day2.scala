@@ -1,5 +1,7 @@
 package eu.derfniw.aoc2021.d2
 
+import eu.derfniw.aoc2021.*
+
 import scala.io.Source
 
 case class Vec(x: Int, y: Int):
@@ -29,7 +31,7 @@ def exercise2(in: Source): Int =
   finalPosition.x * finalPosition.y
 
 @main
-def run_2_1(): Unit = println(exercise1(input))
+def run_2_1(): Unit = printWithRuntime(exercise1(input))
 
 @main
-def run_2_2(): Unit = println(exercise2(input))
+def run_2_2(): Unit = printWithRuntime(exercise2(input))

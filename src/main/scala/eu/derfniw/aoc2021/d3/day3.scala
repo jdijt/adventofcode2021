@@ -1,5 +1,7 @@
 package eu.derfniw.aoc2021.d3
 
+import eu.derfniw.aoc2021.*
+
 import scala.io.Source
 
 private def parseInput(in: Source): BitValues =
@@ -23,19 +25,21 @@ class BitValues(vals: Seq[Int], val bitWidth: Int):
 
   def keepZeroes(bitIndex: Int): BitValues =
     BitValues(vals.filter(v => (v & bitMasks(bitIndex)) == 0), bitWidth)
+end BitValues
 
 def exercise1(in: Source): Int =
   val input    = parseInput(in)
   val combined = input.oneCounts.zip(input.zeroCounts).zipWithIndex
   val gamma = combined.map { case ((oneCount, zeroCount), idx) =>
-    (if (oneCount > zeroCount) 1 else 0) * math.pow(2, idx).toInt
+    (if oneCount > zeroCount then 1 else 0) * math.pow(2, idx).toInt
   }.sum
 
   val epsilon = combined.map { case ((oneCount, zeroCount), idx) =>
-    (if (oneCount < zeroCount) 1 else 0) * math.pow(2, idx).toInt
+    (if oneCount < zeroCount then 1 else 0) * math.pow(2, idx).toInt
   }.sum
 
   gamma * epsilon
+end exercise1
 
 def exercise2(in: Source): Int =
   val input          = parseInput(in)
@@ -45,7 +49,7 @@ def exercise2(in: Source): Int =
     .foldLeft(input) {
       case (i, _) if i.length == 1 => i
       case (i, idx) =>
-        if (i.oneCounts(idx) >= i.zeroCounts(idx)) i.keepOnes(idx)
+        if i.oneCounts(idx) >= i.zeroCounts(idx) then i.keepOnes(idx)
         else i.keepZeroes(idx)
     }
     .head
@@ -54,17 +58,18 @@ def exercise2(in: Source): Int =
     .foldLeft(input) {
       case (i, _) if i.length == 1 => i
       case (i, idx) =>
-        if (i.oneCounts(idx) < i.zeroCounts(idx)) i.keepOnes(idx)
+        if i.oneCounts(idx) < i.zeroCounts(idx) then i.keepOnes(idx)
         else i.keepZeroes(idx)
     }
     .head
 
   ox * co2
+end exercise2
 
 private lazy val input: Source = Source.fromResource("exerciseInputs/input_d03.txt")
 
 @main
-def run_3_1(): Unit = println(exercise1(input))
+def run_3_1(): Unit = printWithRuntime(exercise1(input))
 
 @main
-def run_3_2(): Unit = println(exercise2(input))
+def run_3_2(): Unit = printWithRuntime(exercise2(input))

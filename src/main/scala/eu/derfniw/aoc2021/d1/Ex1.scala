@@ -1,11 +1,13 @@
 package eu.derfniw.aoc2021.d1
 
+import eu.derfniw.aoc2021.*
+
 import scala.io.Source
 
 private lazy val input = Source.fromResource("exerciseInputs/input_d01.txt")
 
 private def mapInput(in: Source) =
-  in.getLines.filter(_.matches("""[0-9]+""")).map(_.toInt)
+  in.getLines.map(_.toInt)
 
 private def countIncreasingPairs(in: Iterator[Int]) =
   in.sliding(2).count { case prev +: next +: _ => prev < next }
@@ -19,11 +21,9 @@ def exercise2(in: Source): Int =
   countIncreasingPairs(windowSums)
 
 @main
-def run_1_1(): Unit = {
-  println(exercise1(input))
-}
+def run_1_1(): Unit =
+  printWithRuntime(exercise1(input))
 
 @main
-def run_1_2(): Unit = {
-  println(exercise2(input))
-}
+def run_1_2(): Unit =
+  printWithRuntime(exercise2(input))

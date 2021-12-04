@@ -1,5 +1,7 @@
 package eu.derfniw.aoc2021.d4
 
+import eu.derfniw.aoc2021.*
+
 import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.io.Source
@@ -9,41 +11,41 @@ enum Field:
   case UnMarked(v: Int) extends Field
 
 case class Board(values: Seq[Seq[Field]]):
-  import Field._
+  import Field.*
 
   val isWinner: Boolean =
     val hasWinningRow    = values.exists(_.forall(_ == Marked))
-    val columnSeqs       = for { col <- 0 until 5 } yield (0 until 5).map(row => values(row)(col))
-    val hasWinningColumn = columnSeqs.exists(_.forall(_ == Marked))
-
+    val columns          = (0 until 5).map(col => (0 until 5).map(row => values(row)(col)))
+    val hasWinningColumn = columns.exists(_.forall(_ == Marked))
     hasWinningColumn || hasWinningRow
 
   def markValue(value: Int): Board =
-    val newValues = values.map { row =>
-      row.map {
-        case UnMarked(v) if v == value => Marked
-        case other                     => other
-      }
-    }
+    val newValues = values.map(_.map {
+      case UnMarked(v) if v == value => Marked
+      case other                     => other
+    })
     Board(newValues)
 
   def sumUnmarked: Int = values.flatten.collect { case UnMarked(v) => v }.sum
+end Board
 
 // First line: Input, then newline seperated boards of 5x5 int
 private def parseInput(in: Source): (List[Int], List[Board]) =
+  import Field.*
   val lines     = in.getLines()
   val inputNums = lines.next().split(",").map(_.toInt).toList
 
   val boardsCollector = mutable.ArrayDeque[Board]()
 
-  while (lines.hasNext)
+  while lines.hasNext do
     lines.next() // Skip empty line
-    val fields = (0 until 5).map { _ =>
-      lines.next().strip().split("""\s+""").map(v => Field.UnMarked(v.toInt)).toSeq
-    }
+    val fields =
+      (0 until 5).map(_ => lines.next().strip().split("""\s+""").map(v => UnMarked(v.toInt)).toSeq)
     boardsCollector.addOne(Board(fields))
+  end while
 
   (inputNums, boardsCollector.toList)
+end parseInput
 
 def exercise1(in: Source): Int =
   val (inputNumbers, boards) = parseInput(in)
@@ -61,6 +63,7 @@ def exercise1(in: Source): Int =
 
   val (winningNumber, winningBoard) = playGame(inputNumbers, boards)
   winningNumber * winningBoard.sumUnmarked
+end exercise1
 
 def exercise2(in: Source): Int =
   val (inputNumbers, boards) = parseInput(in)
@@ -80,11 +83,12 @@ def exercise2(in: Source): Int =
 
   val (winningNumber, winningBoard) = playGame(inputNumbers, boards, List())
   winningNumber * winningBoard.sumUnmarked
+end exercise2
 
 private lazy val input: Source = Source.fromResource("exerciseInputs/input_d04.txt")
 
 @main
-def run_3_1(): Unit = println(exercise1(input))
+def run_4_1(): Unit = printWithRuntime(exercise1(input))
 
 @main
-def run_3_2(): Unit = println(exercise2(input))
+def run_4_2(): Unit = printWithRuntime(exercise2(input))
