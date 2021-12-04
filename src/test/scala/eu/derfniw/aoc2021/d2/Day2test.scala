@@ -2,7 +2,7 @@ package eu.derfniw.aoc2021.d2
 
 import scala.io.Source
 
-class Day2test extends munit.FunSuite {
+class Day2test extends munit.FunSuite:
 
   private val input =
     """forward 5
@@ -23,4 +23,3 @@ class Day2test extends munit.FunSuite {
 
     assertEquals(result, 900)
   }
-}

@@ -2,35 +2,29 @@ package eu.derfniw.aoc2021.d3
 
 import scala.io.Source
 
-private def parseInput(in: Source): BitValues = {
+private def parseInput(in: Source): BitValues =
   val lines    = in.getLines().toSeq
   val bitWidth = lines.head.length
   BitValues(lines.map(str => Integer.valueOf(str, 2)), bitWidth)
-}
 
-class BitValues(vals: Seq[Int], val bitWidth: Int) {
+class BitValues(vals: Seq[Int], val bitWidth: Int):
 
   private val bitMasks = (0 until bitWidth).map(1 << _)
 
   val length: Int = vals.length
   val head: Int   = vals.head
 
-  val oneCounts: Seq[Int] = bitMasks.map { mask =>
-    vals.map(_ & mask).count(_ > 0)
-  }
+  val oneCounts: Seq[Int] = bitMasks.map(mask => vals.map(_ & mask).count(_ > 0))
 
-  val zeroCounts: Seq[Int] = bitMasks.map { mask =>
-    vals.map(_ & mask).count(_ == 0)
-  }
+  val zeroCounts: Seq[Int] = bitMasks.map(mask => vals.map(_ & mask).count(_ == 0))
 
   def keepOnes(bitIndex: Int): BitValues =
     BitValues(vals.filter(v => (v & bitMasks(bitIndex)) > 0), bitWidth)
 
   def keepZeroes(bitIndex: Int): BitValues =
     BitValues(vals.filter(v => (v & bitMasks(bitIndex)) == 0), bitWidth)
-}
 
-def exercise1(in: Source): Int = {
+def exercise1(in: Source): Int =
   val input    = parseInput(in)
   val combined = input.oneCounts.zip(input.zeroCounts).zipWithIndex
   val gamma = combined.map { case ((oneCount, zeroCount), idx) =>
@@ -42,9 +36,8 @@ def exercise1(in: Source): Int = {
   }.sum
 
   gamma * epsilon
-}
 
-def exercise2(in: Source): Int = {
+def exercise2(in: Source): Int =
   val input          = parseInput(in)
   val indexesToCheck = (0 until input.bitWidth).reverse
 
@@ -67,7 +60,6 @@ def exercise2(in: Source): Int = {
     .head
 
   ox * co2
-}
 
 private lazy val input: Source = Source.fromResource("exerciseInputs/input_d03.txt")
 

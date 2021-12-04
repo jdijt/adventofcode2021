@@ -12,12 +12,11 @@ private def countIncreasingPairs(in: Iterator[Int]) =
 
 def exercise1(in: Source): Int = countIncreasingPairs(mapInput(in))
 
-def exercise2(in: Source): Int = {
+def exercise2(in: Source): Int =
   val parsedInput = mapInput(in)
   val windowSums  = parsedInput.sliding(3).map(_.sum)
 
   countIncreasingPairs(windowSums)
-}
 
 @main
 def run_1_1(): Unit = {

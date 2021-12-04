@@ -4,7 +4,7 @@ import munit.FunSuite
 
 import scala.io.Source
 
-class Ex1Test extends FunSuite {
+class Ex1Test extends FunSuite:
 
   private val testInput =
     """ 
@@ -31,5 +31,3 @@ class Ex1Test extends FunSuite {
 
     assertEquals(result, 5)
   }
-
-}
