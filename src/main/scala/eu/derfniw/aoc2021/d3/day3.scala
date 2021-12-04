@@ -32,17 +32,16 @@ class BitValues(vals: Seq[Int], val bitWidth: Int) {
 
 def exercise1(in: Source): Int = {
   val input    = parseInput(in)
-  val combined = input.oneCounts.zip(input.zeroCounts)
-  val gamma = combined
-    .map((oneCount, zeroCount) => if (oneCount > zeroCount) '1' else '0')
-    .reverse
-    .mkString
-  val epsilon = combined
-    .map((oneCount, zeroCount) => if (oneCount < zeroCount) '1' else '0')
-    .reverse
-    .mkString
+  val combined = input.oneCounts.zip(input.zeroCounts).zipWithIndex
+  val gamma = combined.map { case ((oneCount, zeroCount), idx) =>
+    (if (oneCount > zeroCount) 1 else 0) * math.pow(2, idx).toInt
+  }.sum
 
-  Integer.valueOf(gamma, 2) * Integer.valueOf(epsilon, 2)
+  val epsilon = combined.map { case ((oneCount, zeroCount), idx) =>
+    (if (oneCount < zeroCount) 1 else 0) * math.pow(2, idx).toInt
+  }.sum
+
+  gamma * epsilon
 }
 
 def exercise2(in: Source): Int = {
