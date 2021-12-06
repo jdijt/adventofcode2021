@@ -10,9 +10,9 @@ private def parseInput(in: Source): Seq[Int] =
   in.getLines().next().split(",").map(_.toInt)
 
 // Deduplicates lists of fish population to one FishPop per day
-extension (fishPops: Seq[FishPop])
-  def deduplicate: Seq[FishPop] =
-    fishPops.groupBy(_.day).map((d, pops) => FishPop(d, pops.map(_.count).sum)).toSeq
+extension (fishPops: Iterable[FishPop])
+  def deduplicate: Iterable[FishPop] =
+    fishPops.groupBy(_.day).map((d, pops) => FishPop(d, pops.map(_.count).sum))
 
 private def simulatePopulation(in: Source, iterations: Int): Long =
   // Seq[(days, count)]
