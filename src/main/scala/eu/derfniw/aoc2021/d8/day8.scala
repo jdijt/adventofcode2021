@@ -15,33 +15,26 @@ class Line(in: String):
   private val eigthPattern = notes.find(_.size == 7).get
   // 9 is the only number with length 6 that overlaps with 4
   private val ninePattern = notes
-    .filter(_.size == 6)
-    .find { c =>
-      fourPattern.removedAll(c).isEmpty
-    }
+    .find(c => c.size == 6 && fourPattern.removedAll(c).isEmpty)
     .get
   // 6 is the only number with length 6 that doesn't overlap with 7.
   private val sixPattern = notes
-    .filter(_.size == 6)
-    .find(c => sevenPattern.removedAll(c).size == 1)
+    .find(c => c.size == 6 && sevenPattern.removedAll(c).size == 1)
     .get
   // 0 is not 9 or 6
   private val zeroPattern = notes
-    .filter(_.size == 6)
-    .find(c => c != ninePattern && c != sixPattern)
+    .find(c => c.size == 6 && c != ninePattern && c != sixPattern)
     .get
   // Five can be constructed from 8, six and nine.
   private val fivePattern =
     eigthPattern.intersect(sixPattern).intersect(ninePattern)
   // Two is the only one of the 5 length numbers that has the two values that 5 doesn't.
   private val twoPattern = notes
-    .filter(_.size == 5)
-    .find(_.count(eigthPattern.removedAll(fivePattern)) == 2)
+    .find(c => c.size == 5 && c.count(eigthPattern.removedAll(fivePattern)) == 2)
     .get
   // Three isn't five or two
   private val threePattern = notes
-    .filter(_.size == 5)
-    .find(c => c != fivePattern && c != twoPattern)
+    .find(c => c.size == 5 && c != fivePattern && c != twoPattern)
     .get
 
   private def getNumValue(value: String): Int =
@@ -61,7 +54,7 @@ class Line(in: String):
   end getNumValue
 
   def getValue: Int =
-    output.reverse.zipWithIndex.map((v, i) => getNumValue(v) * math.pow(10, i).toInt).sum
+    output.reverseIterator.zipWithIndex.map((v, i) => getNumValue(v) * math.pow(10, i).toInt).sum
 
 end Line
 
@@ -73,7 +66,7 @@ def exercise1(source: Source): Int = source
   .count(s => s.length == 2 || s.length == 3 || s.length == 4 || s.length == 7)
 
 def exercise2(source: Source): Int =
-  source.getLines().map(l => new Line(l)).map(_.getValue).sum
+  source.getLines().map(l => Line(l)).map(_.getValue).sum
 
 private lazy val input: Source = Source.fromResource("exerciseInputs/input_d08.txt")
 
