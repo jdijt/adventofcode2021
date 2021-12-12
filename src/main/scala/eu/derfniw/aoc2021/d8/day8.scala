@@ -12,7 +12,7 @@ class Line(in: String):
   private val onePattern   = notes.find(_.size == 2).get
   private val sevenPattern = notes.find(_.size == 3).get
   private val fourPattern  = notes.find(_.size == 4).get
-  private val eigthPattern = notes.find(_.size == 7).get
+  private val eightPattern = notes.find(_.size == 7).get
   // 9 is the only number with length 6 that overlaps with 4
   private val ninePattern = notes
     .find(c => c.size == 6 && fourPattern.removedAll(c).isEmpty)
@@ -27,10 +27,10 @@ class Line(in: String):
     .get
   // Five can be constructed from 8, six and nine.
   private val fivePattern =
-    eigthPattern.intersect(sixPattern).intersect(ninePattern)
+    eightPattern.intersect(sixPattern).intersect(ninePattern)
   // Two is the only one of the 5 length numbers that has the two values that 5 doesn't.
   private val twoPattern = notes
-    .find(c => c.size == 5 && c.count(eigthPattern.removedAll(fivePattern)) == 2)
+    .find(c => c.size == 5 && c.count(eightPattern.removedAll(fivePattern)) == 2)
     .get
   // Three isn't five or two
   private val threePattern = notes
@@ -47,7 +47,7 @@ class Line(in: String):
     else if set == fivePattern then 5
     else if set == sixPattern then 6
     else if set == sevenPattern then 7
-    else if set == eigthPattern then 8
+    else if set == eightPattern then 8
     else if set == ninePattern then 9
     else throw new RuntimeException(s"Bad pattern! $value $set")
     end if

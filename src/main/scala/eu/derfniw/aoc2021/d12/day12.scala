@@ -2,9 +2,6 @@ package eu.derfniw.aoc2021.d12
 
 import eu.derfniw.aoc2021.printWithRuntime
 
-import scala.annotation.tailrec
-import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
 enum Cave(val id: String):
