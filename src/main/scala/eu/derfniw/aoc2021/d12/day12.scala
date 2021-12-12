@@ -8,10 +8,10 @@ import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
 enum Cave(val id: String):
-  case StartCave extends Cave("start")
-  case BigCave(name: String) extends Cave(name)
+  case StartCave               extends Cave("start")
+  case BigCave(name: String)   extends Cave(name)
   case SmallCave(name: String) extends Cave(name)
-  case EndCave extends Cave("end")
+  case EndCave                 extends Cave("end")
 
 object Cave:
   def apply(in: String): Cave = in match
@@ -54,20 +54,20 @@ def exercise2(source: Source): Int =
   val caveSystem = parseInput(source)
 
   def dfs(current: Cave, visited: Set[Cave] = Set.empty, smallCaveTwice: Boolean = false): Int =
-    // helper defs:
     def nextCaves = caveSystem.adjacentCaves(current).removedAll(visited).toList
-    def additionalSmallCaves =
+
+    def extraCaves =
       if smallCaveTwice then List.empty
       else (caveSystem.adjacentCaves(current).intersect(visited) - StartCave).toList
 
+    def step(newVisited: Set[Cave]) =
+      nextCaves.map(c => dfs(c, newVisited, smallCaveTwice)).sum
+        + extraCaves.map(c => dfs(c, newVisited, true)).sum
+
     current match
-      case EndCave => 1
-      case SmallCave(_) | StartCave =>
-        nextCaves.map(c => dfs(c, visited + current, smallCaveTwice)).sum
-          + additionalSmallCaves.map(c => dfs(c, visited + current, true)).sum
-      case BigCave(_) =>
-        nextCaves.map(c => dfs(c, visited, smallCaveTwice)).sum
-          + additionalSmallCaves.map(c => dfs(c, visited, true)).sum
+      case EndCave                  => 1
+      case SmallCave(_) | StartCave => step(visited + current)
+      case BigCave(_)               => step(visited)
     end match
   end dfs
 

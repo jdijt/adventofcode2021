@@ -7,8 +7,8 @@ import scala.collection.mutable
 import scala.io.Source
 
 enum Field:
-  case Marked extends Field
-  case UnMarked(v: Int) extends Field
+  case Marked
+  case UnMarked(v: Int)
 
 case class Board(values: Seq[Seq[Field]]):
   import Field.*
