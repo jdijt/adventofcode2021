@@ -9,6 +9,6 @@ def printWithRuntime(b: => Any): Unit =
   val runtime = Duration.fromNanos(end - start)
   println(s"""
        |Result: $result
-       |Runtime: ${runtime.toMillis} ms
+       |Runtime: ${runtime.toMicros} μs
        |""".stripMargin)
 end printWithRuntime
