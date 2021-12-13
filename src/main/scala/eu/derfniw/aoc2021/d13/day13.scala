@@ -21,8 +21,8 @@ type Grid = IndexedSeq[IndexedSeq[Boolean]]
 extension (grid: Grid)
   def updated(x: Int, y: Int, value: Boolean) = grid.updated(y, grid(y).updated(x, value))
 
-  def applyFold(fold: Fold): Grid =
-    val (base, toOverLay) = fold match
+  def folded(fold: Fold): Grid =
+    val (base, overlay) = fold match
       case Fold.FoldX(xLine) =>
         val left  = grid.map(_.take(xLine))
         val right = grid.map(_.drop(xLine + 1).reverse)
@@ -31,10 +31,11 @@ extension (grid: Grid)
         val upper = grid.take(yLine)
         val lower = grid.drop(yLine + 1).reverse
         (upper, lower)
-    base.zip(toOverLay).map { case (baseRow, overLayRow) =>
-      baseRow.zip(overLayRow).map { case (b1, b2) => b1 || b2 }
+
+    base.zip(overlay).map { case (baseRow, overlayRow) =>
+      baseRow.zip(overlayRow).map { case (b1, b2) => b1 || b2 }
     }
-  end applyFold
+  end folded
 end extension
 
 private def parseInput(source: Source): (Grid, List[Fold]) =
@@ -55,15 +56,15 @@ end parseInput
 
 def exercise1(source: Source): Int =
   val (grid, folds) = parseInput(source)
-  val newGrid       = grid.applyFold(folds.head)
+  val newGrid       = grid.folded(folds.head)
   newGrid.flatten.count(_ == true)
 end exercise1
 
 def exercise2(source: Source): String =
   val (grid, folds) = parseInput(source)
-  val folded        = folds.foldLeft(grid)((grid, fold) => grid.applyFold(fold))
+  val folded        = folds.foldLeft(grid)((grid, fold) => grid.folded(fold))
   folded
-    .map(_.map(b => if b then '#' else ' ').mkString)
+    .map(_.map(b => if b then '█' else ' ').mkString)
     .mkString("\n", "\n", "\n")
 end exercise2
 
