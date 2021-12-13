@@ -22,7 +22,7 @@ extension (grid: Grid)
   def updated(x: Int, y: Int, value: Boolean) = grid.updated(y, grid(y).updated(x, value))
 
   def applyFold(fold: Fold): Grid =
-    val (base, toOverLay) = fold match
+    val (base, overlay) = fold match
       case Fold.FoldX(xLine) =>
         val left  = grid.map(_.take(xLine))
         val right = grid.map(_.drop(xLine + 1).reverse)
@@ -31,8 +31,8 @@ extension (grid: Grid)
         val upper = grid.take(yLine)
         val lower = grid.drop(yLine + 1).reverse
         (upper, lower)
-    base.zip(toOverLay).map { case (baseRow, overLayRow) =>
-      baseRow.zip(overLayRow).map { case (b1, b2) => b1 || b2 }
+    base.zip(overlay).map { case (baseRow, overlayRow) =>
+      baseRow.zip(overlayRow).map { case (b1, b2) => b1 || b2 }
     }
   end applyFold
 end extension
