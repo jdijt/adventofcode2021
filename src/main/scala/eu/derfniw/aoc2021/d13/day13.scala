@@ -16,57 +16,43 @@ object Fold:
     case _                  => throw new RuntimeException("In valid fold line!")
 end Fold
 
-type Grid = IndexedSeq[IndexedSeq[Boolean]]
+case class Point(x: Int, y: Int):
+  def applyFold(f: Fold): Point = f match
+    case Fold.FoldX(xi) if xi < x => Point(xi - (x - xi), y)
+    case Fold.FoldY(yi) if yi < y => Point(x, yi - (y - yi))
+    case _                        => this
 
-extension (grid: Grid)
-  def updated(x: Int, y: Int, value: Boolean) = grid.updated(y, grid(y).updated(x, value))
+type SparseGrid = Set[Point]
 
-  def folded(fold: Fold): Grid =
-    val (base, overlay) = fold match
-      case Fold.FoldX(xLine) =>
-        val left  = grid.map(_.take(xLine))
-        val right = grid.map(_.drop(xLine + 1).reverse)
-        (left, right)
-      case Fold.FoldY(yLine) =>
-        val upper = grid.take(yLine)
-        val lower = grid.drop(yLine + 1).reverse
-        (upper, lower)
+extension (grid: SparseGrid)
+  def folded(fold: Fold): SparseGrid = grid.map(_.applyFold(fold))
 
-    base.zip(overlay).map { case (baseRow, overlayRow) =>
-      baseRow.zip(overlayRow).map { case (b1, b2) => b1 || b2 }
-    }
-  end folded
+  def render: String =
+    val maxX = grid.map(_.x).max + 1
+    val maxY = grid.map(_.y).max + 1
+    (0 to maxY)
+      .map(y => (0 to maxX).map(x => if grid(Point(x, y)) then '█' else ' ').mkString)
+      .mkString("\n", "\n", "\n")
 end extension
 
-private def parseInput(source: Source): (Grid, List[Fold]) =
-  val lines = source.getLines()
-  val dotGrid =
-    val positions = lines.takeWhile(_.nonEmpty).map { case s"$x,$y" => (x.toInt, y.toInt) }.toSeq
-    val maxY      = positions.maxBy(_._2)._2 + 1
-    val maxX      = positions.maxBy(_._1)._1 + 1
-    val grid      = IndexedSeq.fill(maxY)(IndexedSeq.fill(maxX)(false))
-    positions.foldLeft(grid) { case (grid, (x, y)) => grid.updated(x, y, true) }
-
-  // Map remainder into Fold instances
-  // No need to skip the empty line as it is consumed by the takeWhile already..
-  val folds = lines.map(Fold.fromLine).toList
-
-  (dotGrid, folds)
-end parseInput
+extension (source: Source)
+  def parsed: (SparseGrid, List[Fold]) =
+    val lines   = source.getLines()
+    val dotGrid = lines.takeWhile(_.nonEmpty).map { case s"$x,$y" => Point(x.toInt, y.toInt) }.toSet
+    // Map remainder into Fold instances
+    // No need to skip the empty line as it is consumed by the takeWhile already..
+    val folds = lines.map(Fold.fromLine).toList
+    (dotGrid, folds)
+  end parsed
+end extension
 
 def exercise1(source: Source): Int =
-  val (grid, folds) = parseInput(source)
-  val newGrid       = grid.folded(folds.head)
-  newGrid.flatten.count(_ == true)
-end exercise1
+  val (grid, folds) = source.parsed
+  grid.folded(folds.head).size
 
 def exercise2(source: Source): String =
-  val (grid, folds) = parseInput(source)
-  val folded        = folds.foldLeft(grid)((grid, fold) => grid.folded(fold))
-  folded
-    .map(_.map(b => if b then '█' else ' ').mkString)
-    .mkString("\n", "\n", "\n")
-end exercise2
+  val (grid, folds) = source.parsed
+  folds.foldLeft(grid)((g, f) => g.folded(f)).render
 
 private lazy val input: Source = Source.fromResource("exerciseInputs/input_d13.txt")
 
