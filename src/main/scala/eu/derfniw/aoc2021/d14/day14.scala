@@ -62,7 +62,7 @@ end exercise2
 private lazy val input: Source = Source.fromResource("exerciseInputs/input_d14.txt")
 
 @main
-def run_13_1(): Unit = printWithRuntime(exercise1(input))
+def run_14_1(): Unit = printWithRuntime(exercise1(input))
 
 @main
-def run_13_2(): Unit = printWithRuntime(exercise2(input))
+def run_14_2(): Unit = printWithRuntime(exercise2(input))
