@@ -25,7 +25,12 @@ class Day14Test extends munit.FunSuite:
 
   test("Part 1 works per example") {
     val result = exercise1(Source.fromString(input))
-    assertEquals(result, 1588)
+    assertEquals(result, BigInt(1588))
+  }
+
+  test("Part 2 works per example") {
+    val result = exercise2(Source.fromString(input))
+    assertEquals(result, BigInt(2188189693529L))
   }
 
 end Day14Test
