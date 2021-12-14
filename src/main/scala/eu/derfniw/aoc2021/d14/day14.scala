@@ -7,10 +7,10 @@ import scala.io.Source
 
 type PairMapping = PartialFunction[String, Char]
 
-class PolymerChain private (last: Char, counts: Map[String, BigInt]):
+final class PolymerChain private (last: Char, counts: Map[String, BigInt]):
 
   @tailrec
-  final def simulateGrowth(count: Int, mapping: PairMapping): PolymerChain =
+  def simulateGrowth(count: Int, mapping: PairMapping): PolymerChain =
     if count <= 0 then this
     else this.withMapping(mapping).simulateGrowth(count - 1, mapping)
 
