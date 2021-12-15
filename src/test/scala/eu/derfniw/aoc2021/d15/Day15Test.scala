@@ -22,7 +22,7 @@ class Day15Test extends munit.FunSuite:
 
   test("Part 2 works per example") {
     val result = exercise2(Source.fromString(input))
-    assertEquals(result, ???)
+    assertEquals(result, 315)
   }
 
 end Day15Test

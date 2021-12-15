@@ -3,28 +3,81 @@ package eu.derfniw.aoc2021.d15
 import eu.derfniw.aoc2021.printWithRuntime
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 import scala.io.Source
 
-case class Point(x: Int, y: Int):
-  def adjacentPoints: Set[Point] = Set(
+import math.*
+
+private case class Point(x: Int, y: Int):
+  def adjacentPoints: List[Point] = List(
     Point(x - 1, y),
     Point(x + 1, y),
     Point(x, y - 1),
     Point(x, y + 1)
   )
 
+  def manhattanDist(other: Point): Int = math.abs(this.x - other.x) + math.abs(this.y - other.y)
+end Point
+
 class RiskGrid private (grid: IndexedSeq[IndexedSeq[Int]]):
-  val maxY: Int = grid.size
-  val maxX: Int = if maxY > 0 then grid.head.size else 0
+  private val maxY: Int     = grid.size - 1
+  private val maxX: Int     = if maxY > 0 then grid.head.size - 1 else -1
+  private val target: Point = Point(maxX, maxY)
+  private val start: Point  = Point(0, 0)
+  // The risk if traversing the whole cave, nodes go up to 9.
+  private val peakRisk = maxX * maxY * 10
 
-  // Risk per cell is max 9, going out of grid is more risky than traversing whole grid.
-  val peakRisk: Int = maxY * maxX * 10
+  private def inBounds(p: Point): Boolean =
+    p.x >= 0 && p.x <= maxX && p.y >= 0 && p.y <= maxY
 
-  def valueAt(p: Point): Int =
-    if p.y >= 0 && p.y < maxY && p.x >= 0 && p.x < maxY then grid(p.y)(p.x)
-    else peakRisk
+  private def valueAt(p: Point): Int = grid(p.y)(p.x)
 
-  def minStepsToEnd(p: Point): Int = maxX - p.x + maxY - p.y
+  def expand: RiskGrid =
+    def increaseRisk(current: Int, amount: Int): Int =
+      val v = current + amount
+      if v > 9 then v - 9 else v
+
+    val colsExpanded =
+      grid.map(row => (0 until 5).flatMap(riskToAdd => row.map(r => increaseRisk(r, riskToAdd))))
+
+    RiskGrid(
+      (0 until 5).flatMap(riskToAdd => colsExpanded.map(_.map(r => increaseRisk(r, riskToAdd))))
+    )
+  end expand
+
+  // A* search
+  def minimumRiskCost: Int =
+    val gScore = mutable.Map[Point, Int]().withDefault(_ => peakRisk)
+    val fScore = mutable.Map[Point, Int]().withDefault(_ => peakRisk)
+    gScore += (start -> 0)
+    fScore += (start -> start.manhattanDist(target))
+
+    given Ordering[Point] with
+      override def compare(x: Point, y: Point): Int = fScore(y) - fScore(x)
+
+    val openPointsSet = mutable.Set[Point](start)
+    val openPoints    = mutable.PriorityQueue[Point](start)
+
+    while openPoints.nonEmpty do
+      val current = openPoints.dequeue()
+      openPointsSet -= current
+      if current == target then return gScore(current)
+      else
+        current.adjacentPoints.filter(inBounds).foreach { p =>
+          val score = valueAt(p) + gScore(current)
+          if score < gScore(p) then
+            gScore += (p -> score)
+            fScore += (p -> (score + p.manhattanDist(target)))
+            if !openPointsSet(p) then
+              openPoints += p
+              openPointsSet += p
+        }
+      end if
+    end while
+
+    throw new RuntimeException("Empty open points but goal not found")
+  end minimumRiskCost
+
 end RiskGrid
 
 object RiskGrid:
@@ -33,28 +86,13 @@ object RiskGrid:
 
 extension (source: Source) def parsed: RiskGrid = RiskGrid.fromRows(source.getLines())
 
-def exercise1(source: Source): Int =
-  val grid = source.parsed
-  def aStar(
-      goal: Point,
-      open: Set[Point],
-      fScores: Map[Point, Int],
-      gScores: Map[Point, Int],
-      cameFrom: Map[Point, Point]
-  ): Int =
-    if open.isEmpty then throw new RuntimeException("Goal not found!")
-    else
-      val current = open.minBy(p => grid.minStepsToEnd(p))
-      if current == goal then ???
-      else val (newOpen, newFScores, newGScores, newCameFrom) = point.adjacentPoints.foldLeft
-
-end exercise1
+def exercise1(source: Source): Int = source.parsed.minimumRiskCost
 
 def exercise2(source: Source): Int =
-  ???
-end exercise2
+  val expanded = source.parsed.expand
+  expanded.minimumRiskCost
 
-private lazy val input: Source = Source.fromResource("exerciseInputs/input_d14.txt")
+private lazy val input: Source = Source.fromResource("exerciseInputs/input_d15.txt")
 
 @main
 def run_15_1(): Unit = printWithRuntime(exercise1(input))
