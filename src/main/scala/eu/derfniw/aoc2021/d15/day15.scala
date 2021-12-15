@@ -47,8 +47,8 @@ class RiskGrid private (grid: IndexedSeq[IndexedSeq[Int]]):
 
   // A* search
   def minimumRiskCost: Int =
-    val gScore = mutable.Map[Point, Int]().withDefault(_ => peakRisk)
-    gScore += (start -> 0)
+    val gScore = mutable.ArrayBuffer.fill(maxY + 1)(mutable.ArrayBuffer.fill(maxX + 1)(peakRisk))
+    gScore(start.y).update(start.x, 0)
 
     type ScoredPoint = (Point, Int)
     given Ordering[ScoredPoint] with
@@ -58,12 +58,12 @@ class RiskGrid private (grid: IndexedSeq[IndexedSeq[Int]]):
 
     while openPoints.nonEmpty do
       val (current, _) = openPoints.dequeue()
-      if current == target then return gScore(current)
+      if current == target then return gScore(current.y)(current.x)
       else
         current.adjacentPoints.filter(inBounds).foreach { p =>
-          val score = valueAt(p) + gScore(current)
-          if score < gScore(p) then
-            gScore.addOne(p, score)
+          val score = valueAt(p) + gScore(current.y)(current.x)
+          if score < gScore(p.y)(p.x) then
+            gScore(p.y).update(p.x, score)
             openPoints.addOne(p, score + p.manhattanDist(target))
         }
       end if
