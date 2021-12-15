@@ -8,7 +8,7 @@ import scala.io.Source
 
 import math.*
 
-private case class Point(x: Int, y: Int):
+case class Point(x: Int, y: Int):
   def adjacentPoints: List[Point] = List(
     Point(x - 1, y),
     Point(x + 1, y),
@@ -48,29 +48,23 @@ class RiskGrid private (grid: IndexedSeq[IndexedSeq[Int]]):
   // A* search
   def minimumRiskCost: Int =
     val gScore = mutable.Map[Point, Int]().withDefault(_ => peakRisk)
-    val fScore = mutable.Map[Point, Int]().withDefault(_ => peakRisk)
     gScore += (start -> 0)
-    fScore += (start -> start.manhattanDist(target))
 
-    given Ordering[Point] with
-      override def compare(x: Point, y: Point): Int = fScore(y) - fScore(x)
+    type ScoredPoint = (Point, Int)
+    given Ordering[ScoredPoint] with
+      override def compare(x: ScoredPoint, y: ScoredPoint): Int = y._2 - x._2
 
-    val openPointsSet = mutable.Set[Point](start)
-    val openPoints    = mutable.PriorityQueue[Point](start)
+    val openPoints = mutable.PriorityQueue[ScoredPoint]((start, start.manhattanDist(target)))
 
     while openPoints.nonEmpty do
-      val current = openPoints.dequeue()
-      openPointsSet -= current
+      val (current, _) = openPoints.dequeue()
       if current == target then return gScore(current)
       else
         current.adjacentPoints.filter(inBounds).foreach { p =>
           val score = valueAt(p) + gScore(current)
           if score < gScore(p) then
-            gScore += (p -> score)
-            fScore += (p -> (score + p.manhattanDist(target)))
-            if !openPointsSet(p) then
-              openPoints += p
-              openPointsSet += p
+            gScore.addOne(p, score)
+            openPoints.addOne(p, score + p.manhattanDist(target))
         }
       end if
     end while
