@@ -1,5 +1,6 @@
 package eu.derfniw.aoc2021.d16
 
+import scala.annotation.tailrec
 import scala.math.BigInt
 
 sealed trait Packet:
@@ -16,7 +17,8 @@ object Packet:
     val bits = l.flatMap(_.toBits)
     parsePacket(bits)._1
 
-  private def parsePacket(bits: String): (Packet, String) =
+  type ParseResult[A] = (A, String)
+  private def parsePacket(bits: String): ParseResult[Packet] =
     val version    = bits.take(3).toIntBase2
     val typeId     = bits.slice(3, 6).toIntBase2
     val packetBits = bits.drop(6)
@@ -37,26 +39,31 @@ object Packet:
     end if
   end parsePacket
 
-  private def parseLiteralValue(bits: String): (BigInt, String) =
+  private def parseLiteralValue(bits: String): ParseResult[BigInt] =
     val lastNumberIndex = bits.grouped(5).indexWhere(_.startsWith("0"))
     val valueSize       = 5 * (lastNumberIndex + 1)
     val value           = bits.take(valueSize).grouped(5).flatMap(_.tail).mkString.toBigIntBase2
     (value, bits.drop(valueSize))
+  end parseLiteralValue
 
   // Parses as much packages as it can from the bitstring.
-  private def parseBitLine(bits: String): (Seq[Packet], String) =
-    if bits.isEmpty then (Seq(), bits)
+  @tailrec
+  private def parseBitLine(bits: String, parsed: Seq[Packet] = Seq()): ParseResult[Seq[Packet]] =
+    if bits.isEmpty then (parsed, bits)
     else
-      val (packet, remainder)      = parsePacket(bits)
-      val (others, finalRemainder) = parseBitLine(remainder)
-      (packet +: others, finalRemainder)
+      val (packet, remainder) = parsePacket(bits)
+      parseBitLine(remainder, parsed :+ packet)
 
   // Parses up to Count packages from bitString, returns remainder.
-  private def parseNPackages(bits: String, count: Int): (Seq[Packet], String) =
-    if count == 0 then (Seq(), bits)
+  @tailrec
+  private def parseNPackages(
+      bits: String,
+      count: Int,
+      parsed: Seq[Packet] = Seq()
+  ): ParseResult[Seq[Packet]] =
+    if count == 0 then (parsed, bits)
     else
-      val (packet, remainder)      = parsePacket(bits)
-      val (others, finalRemainder) = parseNPackages(remainder, count - 1)
-      (packet +: others, finalRemainder)
+      val (packet, remainder) = parsePacket(bits)
+      parseNPackages(remainder, count - 1, parsed :+ packet)
 
 end Packet

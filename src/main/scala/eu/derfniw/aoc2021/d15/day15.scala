@@ -19,6 +19,9 @@ case class Point(x: Int, y: Int):
   def manhattanDist(other: Point): Int = math.abs(this.x - other.x) + math.abs(this.y - other.y)
 end Point
 
+extension (s: scala.collection.Seq[scala.collection.Seq[Int]])
+  def valueAt(point: Point): Int = s(point.y)(point.x)
+
 class RiskGrid private (grid: IndexedSeq[IndexedSeq[Int]]):
   private val maxY: Int     = grid.size - 1
   private val maxX: Int     = if maxY > 0 then grid.head.size - 1 else -1
@@ -29,8 +32,6 @@ class RiskGrid private (grid: IndexedSeq[IndexedSeq[Int]]):
 
   private def inBounds(p: Point): Boolean =
     p.x >= 0 && p.x <= maxX && p.y >= 0 && p.y <= maxY
-
-  private def valueAt(p: Point): Int = grid(p.y)(p.x)
 
   def expand: RiskGrid =
     def increaseRisk(current: Int, amount: Int): Int =
@@ -61,8 +62,8 @@ class RiskGrid private (grid: IndexedSeq[IndexedSeq[Int]]):
       if current == target then return gScore(current.y)(current.x)
       else
         current.adjacentPoints.filter(inBounds).foreach { p =>
-          val score = valueAt(p) + gScore(current.y)(current.x)
-          if score < gScore(p.y)(p.x) then
+          val score = grid.valueAt(p) + gScore.valueAt(current)
+          if score < gScore.valueAt(p) then
             gScore(p.y).update(p.x, score)
             openPoints.addOne(p, score + p.manhattanDist(target))
         }
