@@ -60,10 +60,16 @@ def exercise2(target: Target): Int =
     .takeWhile { case (_, num) => num <= target.xMax }
     .find { case (_, num) => num >= target.xMin }
     .get
+  val maxY        = exercise1(target)
+  val (maxYdx, _) = triangularNumbers.find { case (_, num) => num == maxY }.get
 
+  // V(xMax, yMin) this would shoot in one step to far edge of target
+  // We know the maxY velocity via exercise1
+  // We can derive minX velocity.
+  // After that, brute force it is.
   val velocities = for
     dx <- minDX to target.xMax
-    dy <- target.yMin to exercise1(target)
+    dy <- target.yMin to maxYdx
   yield Velocity(dx, dy)
 
   velocities.flatMap(v => simulate(target, Position(0, 0), v, 0)).size
