@@ -16,7 +16,7 @@ class Day1Test extends munit.FunSuite:
       |269
       |260
       |263
-      |""".stripMargin
+      |""".stripMargin.strip
 
   test("Part 1 is ok per example") {
     val result = exercise1(Source.fromString(testInput))
