@@ -76,7 +76,7 @@ def exercise2(target: Target): Int =
 end exercise2
 
 @main
-def run_16_1(): Unit = printWithRuntime(exercise1(Target(230, 283, -107, -57)))
+def run_17_1(): Unit = printWithRuntime(exercise1(Target(230, 283, -107, -57)))
 
 @main
-def run_16_2(): Unit = printWithRuntime(exercise2(Target(230, 283, -107, -57)))
+def run_17_2(): Unit = printWithRuntime(exercise2(Target(230, 283, -107, -57)))

@@ -25,6 +25,7 @@ def exercise2(source: Source): BigInt =
         case 1 => childValues.product
         case 2 => childValues.min
         case 3 => childValues.max
+        //   4 would be the LiteralValue ;)
         case 5 => if childValues.head > childValues.last then BigInt(1) else BigInt(0)
         case 6 => if childValues.head < childValues.last then BigInt(1) else BigInt(0)
         case 7 => if childValues.head == childValues.last then BigInt(1) else BigInt(0)
