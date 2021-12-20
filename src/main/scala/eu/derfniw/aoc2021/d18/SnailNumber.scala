@@ -3,6 +3,7 @@ package eu.derfniw.aoc2021.d18
 import eu.derfniw.aoc2021.d18
 
 import scala.annotation.tailrec
+import scala.util.parsing.combinator.RegexParsers
 
 enum SnailNumber:
   def add(other: SnailNumber): SnailNumber = Pair(this, other).reduce
@@ -15,23 +16,15 @@ end SnailNumber
 
 object SnailNumber:
 
-  def fromString(in: String): SnailNumber =
-    if in.forall(_.isDigit) then Number(in.toInt)
-    else
-      // Find the index of the comma belonging to this pair.
-      val (_, pairSplitIndex) = in.zipWithIndex.foldLeft((0, -1)) {
-        case ((level, foundIndex), (c, candidateIndex)) =>
-          c match
-            case '['                                   => (level + 1, foundIndex)
-            case ']'                                   => (level - 1, foundIndex)
-            case ',' if level == 1 && foundIndex == -1 => (level, candidateIndex)
-            case _                                     => (level, foundIndex)
-      }
-      val left = in.substring(1, pairSplitIndex) // Strip first [ and drop trailing comma here..
-      val right = in.substring(pairSplitIndex + 1, in.length - 1) // strip last ]
-      Pair(fromString(left), fromString(right))
-    end if
-  end fromString
+  private object SnailNumberParser extends RegexParsers:
+    def number: Parser[Number] = "[0-9]".r ^^ { num => Number(num.toInt) }
+    def pair: Parser[Pair] = "[" ~ snailNumber ~ "," ~ snailNumber ~ "]" ^^ {
+      case _ ~ leftNum ~ _ ~ rightNum ~ _ => Pair(leftNum, rightNum)
+    }
+    def snailNumber: Parser[SnailNumber]     = pair | number
+    def parseNumber(in: String): SnailNumber = parse(snailNumber, in).get
+
+  def fromString(in: String): SnailNumber = SnailNumberParser.parseNumber(in)
 
   private def magnitude(sn: SnailNumber): Int = sn match
     case Number(n)  => n
