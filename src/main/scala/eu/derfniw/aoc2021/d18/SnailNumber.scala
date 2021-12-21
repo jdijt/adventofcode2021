@@ -18,11 +18,15 @@ object SnailNumber:
 
   private object SnailNumberParser extends RegexParsers:
     def number: Parser[Number] = "[0-9]".r ^^ { num => Number(num.toInt) }
+
     def pair: Parser[Pair] = "[" ~ snailNumber ~ "," ~ snailNumber ~ "]" ^^ {
       case _ ~ leftNum ~ _ ~ rightNum ~ _ => Pair(leftNum, rightNum)
     }
-    def snailNumber: Parser[SnailNumber]     = pair | number
+
+    def snailNumber: Parser[SnailNumber] = pair | number
+
     def parseNumber(in: String): SnailNumber = parse(snailNumber, in).get
+  end SnailNumberParser
 
   def fromString(in: String): SnailNumber = SnailNumberParser.parseNumber(in)
 
