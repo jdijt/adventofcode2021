@@ -81,7 +81,7 @@ def exercise2(p1Start: Int, p2Start: Int): Long =
 end exercise2
 
 @main
-def run_20_1(): Unit = printWithRuntime(exercise1(7, 4))
+def run_21_1(): Unit = printWithRuntime(exercise1(7, 4))
 
 @main
-def run_20_2(): Unit = printWithRuntime(exercise2(7, 4))
+def run_21_2(): Unit = printWithRuntime(exercise2(7, 4))
